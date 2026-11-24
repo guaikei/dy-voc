@@ -1,5 +1,18 @@
 ﻿# 抖音视频助手 更新日志
 
+## 1.5.2
+- 精简 frontmatter：删除 `metadata.keywords` / `metadata.category`；有价值词并入精简 `tags`（触发仍以顶层 `description` 为准）。
+- 再删无效字段：`openclaw.emoji`、`metadata.enabled` / `runtime` / `env_desc`（门禁仍靠 `openclaw.primaryEnv` + `requires`）。
+- 精简 `metadata.examples`：保留六命令主路径中的 search / user-search / post / comment（舆情+痛点）/ detail；去掉 hot、获客编排、链式占位与参数变体。
+- HTTP 429/5xx：可重试（429→`RATE_LIMITED` 且 `noRetry=false`；与业务裸 2 区分）；`classifyPollError` 不再把所有 `ApiError` 一刀切为 fail。
+- Create 成功读取出参 `id`（任务 uuid）：有 `id` 时查询 `/info` **只传 `id`**（不带 keyword/url 等业务字段，避免 uuid 未命中时静默回落他单）；无 `id` 或形态不符时仍只按业务字段查。
+- `pickTaskId` 校验标准 36 字符 uuid 形态，脏值视为缺失。
+- `contract.md` 写入「上游异步任务」约定；明确 CLI 入参/出参 schema 与 stdout 信封**不含**任务 uuid。
+- 执行示例改为 `node "<SKILL_ROOT>/src/douyin/…"`；faq 去掉宿主写死路径，统一用 `<SKILL_ROOT>` 占位。
+- 搜索/用户搜索结果 enrich 与评论对齐：非对象元素原样跳过，避免 `null` 解引用 TypeError。
+- 布尔 flag（如 `--save`）：裸 flag 为 true；`--save=false`/`0` 为 false；非法赋值报错（与 `--json-args` 布尔语义对齐）。
+- 业务码映射：`410`（TOKEN 停用 Gone）/`405`（未开通）/`77`（过期）→ `AUTH_ERROR`；未知数字码兜底 `API_ERROR`（不再裸透出 `"410"`）；传输层补 `HTTP_404`/`HTTP_410` 中文说明。
+
 ## 1.5.1
 - Windows cmd / PowerShell 双壳可复制示例写入 `SKILL.md`；硬规则「cmd 只用双引号」。
 - `references/faq.md` 增加引号/拆参失败症状表、双壳例与绝对路径例。
